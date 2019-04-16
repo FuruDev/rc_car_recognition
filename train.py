@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import pandas
 
+height = 128
+width = 128
+nb_channels = 3
+nb_classes = 2
 
 train_df = pandas.read_csv('dataset/train.csv')
 test_df = pandas.read_csv('dataset/test.csv')
@@ -15,50 +19,98 @@ test_paths = test_df['path']
 train_class = train_df['class']
 test_class = test_df['class']
 
-car = []
-noncar = []
+train_set = []
+test_set = []
 
 for f in train_paths:
     # print(f)
-    car.append(mpimg.imread(f))
+    train_set.append(mpimg.imread(f))
 
 for f in test_paths:
     # print(f)
-    noncar.append(mpimg.imread(f))
+    test_set.append(mpimg.imread(f))
 
 class_names = ['car', 'noncar']
 
-# train_paths = train_paths / 255.0
-# test_paths = test_paths / 255.0
+# print(train_set)
+# print(test_set)
 
-print(car)
-print(noncar)
+# print(train_class)
+# print(test_class)
 
-print(train_class)
-print(test_class)
+train_set = np.asarray(train_set)
+test_set = np.asarray(test_set)
 
+train_class = list(train_class)
+test_class = list(test_class)
 
+# print(train_class)
 
+train_class = np.asarray(train_class)
+test_class = np.asarray(test_class)
 
-plt.figure(figsize=(10,10))
-for i in range(25):
-    plt.subplot(5,5,i+1)
-    plt.xticks([])
-    plt.yticks([])
-    plt.grid(False)
-    plt.imshow(car[i], cmap=plt.cm.binary)
-    plt.xlabel(train_class[i])
-#
+train_class = keras.utils.to_categorical(train_class, nb_classes)
+test_class = keras.utils.to_categorical(test_class, nb_classes)
+
+train_set = train_set / 255.0
+test_set = test_set / 255.0
+
+# print(train_set.shape)
+# print(train_class.shape)
+
+# print(train_set.shape)
 model = keras.Sequential()
 #
-model.add(keras.layers.Flatten(input_shape=(28, 28)))
-model.add(keras.layers.Dense(128, activation='relu'))
-model.add(keras.layers.Dense(10, activation='softmax'))
-#
+# model.add(keras.layers.Flatten(input_shape=(128, 128, 3)))
+# model.add(keras.layers.Dense(128, activation='relu'))
+# model.add(keras.layers.Dense(1, activation='softmax'))
+
+model.add(keras.layers.Conv2D(32,
+                              kernel_size=(3, 3),
+                              strides=(1, 1),
+                              padding='same',
+                              input_shape=(height, width, nb_channels)))
+model.add(keras.layers.Activation('relu'))
+model.add(keras.layers.BatchNormalization(axis=-1))
+model.add(keras.layers.Conv2D(32,
+                              kernel_size=(3, 3),
+                              strides=(1, 1),
+                              padding='same'))
+model.add(keras.layers.Activation('relu'))
+model.add(keras.layers.BatchNormalization(axis=-1))
+model.add(keras.layers.MaxPooling2D(pool_size=(2,2)))
+model.add(keras.layers.Dropout(0.25))
+
+model.add(keras.layers.Conv2D(64,
+                              kernel_size=(3, 3),
+                              strides=(1, 1),
+                              padding='same'))
+model.add(keras.layers.Activation('relu'))
+model.add(keras.layers.BatchNormalization(axis=-1))
+model.add(keras.layers.Conv2D(64,
+                              kernel_size=(3, 3),
+                              strides=(1, 1),
+                              padding='same'))
+model.add(keras.layers.Activation('relu'))
+model.add(keras.layers.BatchNormalization(axis=-1))
+model.add(keras.layers.MaxPooling2D(pool_size=(2,2)))
+model.add(keras.layers.Dropout(0.25))
+
+model.add(keras.layers.Flatten())
+model.add(keras.layers.Dense(512))
+model.add(keras.layers.Activation('relu'))
+model.add(keras.layers.BatchNormalization())
+model.add(keras.layers.Dropout(0.5))
+
+model.add(keras.layers.Dense(nb_classes))
+model.add(keras.layers.Activation('softmax', name='predictions'))
+
 model.summary()
-#
+
 model.compile(optimizer=keras.optimizers.Adam(0.001),
-              loss='categorical_crossentropy', # ! sparse_categorical_crossentropy for without one-hot !
+              loss='binary_crossentropy', # ! sparse_categorical_crossentropy for without one-hot !
               metrics=['accuracy'])
 
-model.fit(car[0], train_class, epochs=5)
+model.fit(train_set, train_class, epochs=5)
+
+model.save('rc.h5')
