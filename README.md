@@ -1,2 +1,2 @@
-# RC Car Recognition / Classifier for Group Project Sem VI
----
+# RC Car Recognition / Classifier
+#### for Group Project Sem VI
