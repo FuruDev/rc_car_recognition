@@ -37,25 +37,28 @@ print(noncar)
 print(train_class)
 print(test_class)
 
-# plt.figure(figsize=(10,10))
-# for i in range(25):
-#     plt.subplot(5,5,i+1)
-#     plt.xticks([])
-#     plt.yticks([])
-#     plt.grid(False)
-#     plt.imshow(train_paths[i], cmap=plt.cm.binary)
-#     plt.xlabel(class_names)
+
+
+
+plt.figure(figsize=(10,10))
+for i in range(25):
+    plt.subplot(5,5,i+1)
+    plt.xticks([])
+    plt.yticks([])
+    plt.grid(False)
+    plt.imshow(car[i], cmap=plt.cm.binary)
+    plt.xlabel(train_class[i])
 #
-# model = keras.Sequential()
+model = keras.Sequential()
 #
-# model.add(keras.layers.Flatten(input_shape=(28, 28)))
-# model.add(keras.layers.Dense(128, activation='relu'))
-# model.add(keras.layers.Dense(10, activation='softmax'))
+model.add(keras.layers.Flatten(input_shape=(28, 28)))
+model.add(keras.layers.Dense(128, activation='relu'))
+model.add(keras.layers.Dense(10, activation='softmax'))
 #
-# model.summary()
+model.summary()
 #
-# model.compile(optimizer=keras.optimizers.Adam(0.001),
-#               loss='categorical_crossentropy', # ! sparse_categorical_crossentropy for without one-hot !
-#               metrics=['accuracy'])
-#
-# model.fit(train_paths, train_labels, epochs=5)
+model.compile(optimizer=keras.optimizers.Adam(0.001),
+              loss='categorical_crossentropy', # ! sparse_categorical_crossentropy for without one-hot !
+              metrics=['accuracy'])
+
+model.fit(car[0], train_class, epochs=5)
