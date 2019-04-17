@@ -103,11 +103,12 @@ model.add(keras.layers.BatchNormalization())
 model.add(keras.layers.Dropout(0.5))
 
 model.add(keras.layers.Dense(nb_classes))
-model.add(keras.layers.Activation('softmax', name='predictions'))
+model.add(keras.layers.Activation('sigmoid')) # ! Activation cannot be softmax
+# solved: https://stackoverflow.com/questions/45378493/why-does-a-binary-keras-cnn-always-predict-1
 
 model.summary()
 
-model.compile(optimizer=keras.optimizers.Adam(0.001),
+model.compile(optimizer='rmsprop', # optimizer change from Adam to rmsprop
               loss='binary_crossentropy', # ! sparse_categorical_crossentropy for without one-hot !
               metrics=['accuracy'])
 

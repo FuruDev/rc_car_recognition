@@ -19,14 +19,14 @@ for file in car:
 for file in noncar:
     f.append((noncar_path + file, 0))
 
-with open('dataset.csv', 'wt', newline='') as csvFile:
+with open('dataset.csv', 'w', newline='') as csvFile:
     writer = csv.writer(csvFile)
     writer.writerow(('path', 'class'))
     writer.writerows(f)
 
 dataframe = pandas.read_csv('dataset.csv')
 
-a, b = sklearn.model_selection.train_test_split(dataframe, random_state=50)
+a, b = sklearn.model_selection.train_test_split(dataframe, random_state=10)
 
 a.to_csv('dataset/train.csv', index=False)
 b.to_csv('dataset/test.csv', index=False)
